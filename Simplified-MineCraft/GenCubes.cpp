@@ -4,6 +4,7 @@
 #include <map>
 #include <time.h>       /* time */
 #include "GenCubes.h"
+#include "Sound.h"
 
 float surf_verts[9 * 36 * 3000];
 float trans_surf_verts[9 * 36 * 200];
@@ -51,6 +52,51 @@ float basic[] = {
 	 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f,
 	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  1.0f,
 	-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f
+};
+
+float arm_basic[] = {
+	// positions          // normals		   // texture coords
+	-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f, ARM_CUBE,
+	 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f, ARM_CUBE,
+	 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  0.0f, ARM_CUBE,
+	 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f, ARM_CUBE,
+	-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f, ARM_CUBE,
+	-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  1.0f, ARM_CUBE,
+
+	-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f, ARM_CUBE,
+	 0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  0.0f, ARM_CUBE,
+	 0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f, ARM_CUBE,
+	 0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f, ARM_CUBE,
+	-0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  1.0f, ARM_CUBE,
+	-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f, ARM_CUBE,
+
+	-0.5f,  0.5f,  0.5f,  -1.0f,  0.0f,  0.0f,  0.0f,  0.0f, ARM_CUBE,
+	-0.5f,  0.5f, -0.5f,  -1.0f,  0.0f,  0.0f,  0.0f,  1.0f, ARM_CUBE,
+	-0.5f, -0.5f, -0.5f,  -1.0f,  0.0f,  0.0f,  1.0f,  1.0f, ARM_CUBE,
+	-0.5f, -0.5f, -0.5f,  -1.0f,  0.0f,  0.0f,  1.0f,  1.0f, ARM_CUBE,
+	-0.5f, -0.5f,  0.5f,  -1.0f,  0.0f,  0.0f,  1.0f,  0.0f, ARM_CUBE,
+	-0.5f,  0.5f,  0.5f,  -1.0f,  0.0f,  0.0f,  0.0f,  0.0f, ARM_CUBE,
+
+	 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  0.0f, ARM_CUBE,
+	 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  1.0f, ARM_CUBE,
+	 0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f, ARM_CUBE,
+	 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  1.0f, ARM_CUBE,
+	 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  0.0f, ARM_CUBE,
+	 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  1.0f, ARM_CUBE,
+
+	-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  0.0f, ARM_CUBE,
+	 0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  0.0f, ARM_CUBE,
+	 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  1.0f, ARM_CUBE,
+	 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  1.0f, ARM_CUBE,
+	-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  1.0f, ARM_CUBE,
+	-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  0.0f, ARM_CUBE,
+
+	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f, ARM_CUBE,
+	 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f, ARM_CUBE,
+	 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f, ARM_CUBE,
+	 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f, ARM_CUBE,
+	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f, ARM_CUBE,
+	-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  1.0f, ARM_CUBE
 };
 
 GLuint my_cube_vao;
@@ -103,19 +149,27 @@ void init_map()
 			{
 				translucentCubeList.push_back(Cube(WATER_CUBE, glm::vec3(float(i), 0.0f, float(j))));
 			}
+
 			else
 			{
-				cubeList.push_back(Cube(GRASS_CUBE, glm::vec3(float(i), 0.0f, float(j))));
+				if (i >= 1 && i <= 3)
+				{
+					cubeList.push_back(Cube(BRICK_CUBE, glm::vec3(float(i), 0.0f, float(j))));
+				}
+				else
+				{
+					cubeList.push_back(Cube(GRASS_CUBE, glm::vec3(float(i), 0.0f, float(j))));
+				}
 
-				if (glm::distance(vec2(i, j), vec2(-2.0f, 12.0f)) <= 3 || glm::distance(vec2(i, j), vec2(-2.0f, -12.0f)) <= 5 || glm::distance(vec2(i, j), vec2(-10.0f, 0.0f)) <= 5)
+				if (glm::distance(vec2(i, j), vec2(-2.0f, 14.0f)) <= 3 || glm::distance(vec2(i, j), vec2(-2.0f, -14.0f)) <= 5 || glm::distance(vec2(i, j), vec2(-10.0f, 0.0f)) <= 5)
 				{
 					cubeList.push_back(Cube(GRASS_CUBE, glm::vec3(float(i), 1.0f, float(j))));
 				}
-				if (glm::distance(vec2(i, j), vec2(-2.0f, 12.0f)) <= 2 || glm::distance(vec2(i, j), vec2(-2.0f, -12.0f)) <= 4 || glm::distance(vec2(i, j), vec2(-10.0f, 0.0f)) <= 3)
+				if (glm::distance(vec2(i, j), vec2(-2.0f, 14.0f)) <= 2 || glm::distance(vec2(i, j), vec2(-2.0f, -14.0f)) <= 4 || glm::distance(vec2(i, j), vec2(-10.0f, 0.0f)) <= 3)
 				{
 					cubeList.push_back(Cube(GRASS_CUBE, glm::vec3(float(i), 2.0f, float(j))));
 				}
-				if (glm::distance(vec2(i, j), vec2(-2.0f, -12.0f)) <= 3)
+				if (glm::distance(vec2(i, j), vec2(-2.0f, -14.0f)) <= 3)
 				{
 					cubeList.push_back(Cube(GRASS_CUBE, glm::vec3(float(i), 3.0f, float(j))));
 				}
@@ -123,10 +177,34 @@ void init_map()
 		}
 	}
 
+	cubeList.push_back(Cube(BRICK_CUBE, glm::vec3(0.0f, 1.0f, 0.0f)));
+	cubeList.push_back(Cube(BRICK_CUBE, glm::vec3(0.0f, 1.0f, 4.0f)));
+	cubeList.push_back(Cube(BRICK_CUBE, glm::vec3(0.0f, 1.0f, -4.0f)));
+	cubeList.push_back(Cube(BRICK_CUBE, glm::vec3(4.0f, 1.0f, 0.0f)));
+	cubeList.push_back(Cube(BRICK_CUBE, glm::vec3(4.0f, 1.0f, 4.0f)));
+	cubeList.push_back(Cube(BRICK_CUBE, glm::vec3(4.0f, 1.0f, -4.0f)));
+
+	cubeList.push_back(Cube(BRICK_CUBE, glm::vec3(0.0f, 1.0f, 8.0f)));
+	cubeList.push_back(Cube(BRICK_CUBE, glm::vec3(0.0f, 1.0f, -8.0f)));
+	cubeList.push_back(Cube(BRICK_CUBE, glm::vec3(4.0f, 1.0f, 8.0f)));
+	cubeList.push_back(Cube(BRICK_CUBE, glm::vec3(4.0f, 1.0f, -8.0f)));
+
+	cubeList.push_back(Cube(LIGHT_CUBE, glm::vec3(0.0f, 2.0f, 0.0f)));
+	cubeList.push_back(Cube(LIGHT_CUBE, glm::vec3(0.0f, 2.0f, 4.0f)));
+	cubeList.push_back(Cube(LIGHT_CUBE, glm::vec3(0.0f, 2.0f, -4.0f)));
+	cubeList.push_back(Cube(LIGHT_CUBE, glm::vec3(4.0f, 2.0f, 0.0f)));
+	cubeList.push_back(Cube(LIGHT_CUBE, glm::vec3(4.0f, 2.0f, 4.0f)));
+	cubeList.push_back(Cube(LIGHT_CUBE, glm::vec3(4.0f, 2.0f, -4.0f)));
+
+	cubeList.push_back(Cube(LIGHT_CUBE, glm::vec3(0.0f, 2.0f, 8.0f)));
+	cubeList.push_back(Cube(LIGHT_CUBE, glm::vec3(0.0f, 2.0f, -8.0f)));
+	cubeList.push_back(Cube(LIGHT_CUBE, glm::vec3(4.0f, 2.0f, 8.0f)));
+	cubeList.push_back(Cube(LIGHT_CUBE, glm::vec3(4.0f, 2.0f, -8.0f)));
+
 	srand(time(NULL));
-	createTree(5 + rand() % 4, vec3(-2.0f, 3.0f, -12.0f));
-	createTree(5 + rand() % 4, vec3(5.0f, 0.0f, 0.0f));
-	createTree(5 + rand() % 4, vec3(-2.0f, 2.0f, 12.0f));
+	createTree(5 + rand() % 4, vec3(-2.0f, 3.0f, -14.0f));
+	createTree(5 + rand() % 4, vec3(7.0f, 0.0f, 0.0f));
+	createTree(5 + rand() % 4, vec3(-2.0f, 2.0f, 14.0f));
 }
 
 GLuint create_cube_vbo()
@@ -321,17 +399,12 @@ GLuint create_plane_vao()
 	return vao;
 }
 GLuint create_hand_vbo() {
-	float vertices[36 * 3];
-	for(int i = 0; i < 36; i++)
-		for (int j = 0; j < 3; j++) {
-			vertices[3 * i + j] = basic[8 * i + j];
-		}
 
 	GLuint vbo;
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(arm_basic), arm_basic, GL_STATIC_DRAW);
 
 	return vbo;
 }
@@ -347,8 +420,57 @@ GLuint create_hand_vao()
 	const GLint pos_loc = 0;
 	glEnableVertexAttribArray(pos_loc);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(8 * sizeof(float)));
+	glEnableVertexAttribArray(3);
+
+	glBindVertexArray(0);
+	return vao;
+}
+GLuint create_ui_vbo() {
+	float vertices[12 * 6] = {	
+		-0.9f, -1.0f, -1.0f, 0.0f, 0.0f, 1.0f,
+		-0.9f, -0.8f, -1.0f, 0.0f, 1.0f, 1.0f,
+		-0.7f, -1.0f, -1.0f, 1.0f, 0.0f, 1.0f,
+		-0.7f, -1.0f, -1.0f, 1.0f, 0.0f, 1.0f,
+		-0.9f, -0.8f, -1.0f, 0.0f, 1.0f, 1.0f,
+		-0.7f, -0.8f, -1.0f, 1.0f, 1.0f, 1.0f,
+
+		-0.9f, -1.0f, -0.9f, 0.0f, 0.0f, 0.0f,
+		-0.9f, -0.8f, -0.9f, 0.0f, 1.0f, 0.0f,
+		0.9f, -1.0f, -0.9f, 1.0f, 0.0f, 0.0f,
+		0.9f, -1.0f, -0.9f, 1.0f, 0.0f, 0.0f,
+		-0.9f, -0.8f, -0.9f, 0.0f, 1.0f, 0.0f,
+		0.9f, -0.8f, -0.9f, 1.0f, 1.0f, 0.0f
+	};
+	GLuint vbo;
+	glGenBuffers(1, &vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	return vbo;
+}
+
+GLuint create_ui_vao()
+{
+	GLuint vao;
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+	GLuint vbo = create_ui_vbo();
+	const GLint pos_loc = 0;
+	glEnableVertexAttribArray(pos_loc);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(5 * sizeof(float)));
+	glEnableVertexAttribArray(2);
 
 	glBindVertexArray(0);
 	return vao;
@@ -419,20 +541,29 @@ void redefineCubeVBO()
 
 void DeleteCube(glm::vec3 pos)
 {		
-	cubeList.erase(std::remove(cubeList.begin(), cubeList.end(), pos), cubeList.end());
-	redefineCubeVBO();
-
+	if (pos != null) {
+		soundDig();
+		cubeList.erase(std::remove(cubeList.begin(), cubeList.end(), pos), cubeList.end());
+		redefineCubeVBO();
+	}
 }
 
 void AddCube(glm::vec3 pos, int type)
 {
-	cubeList.push_back(Cube(type, pos));
-	redefineCubeVBO();
+	if (pos != null) {
+		soundPut();
+		cubeList.push_back(Cube(type, pos));
+		redefineCubeVBO();
+	}
+}
+
+void draw_ui(GLuint vao)
+{
+	glDrawArrays(GL_TRIANGLES, 0 , 12);
 }
 
 void draw_hand(GLuint vao)
 {
-	
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 }
 

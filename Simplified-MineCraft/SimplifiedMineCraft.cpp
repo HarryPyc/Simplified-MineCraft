@@ -41,6 +41,17 @@ GLuint tree_leaves_texture_id = -1;
 static const std::string water_still_texture_name = "textures/waterBlock/water_still.png";
 GLuint water_still_texture_id = -1;
 
+static const std::string brick_texture_name = "textures/brickBlock/bricks.png";
+GLuint brick_texture_id = -1;
+
+static const std::string ui_texture_name = "textures/ui/widgets.png";
+GLuint ui_texture_id = -1;
+static const std::string select_texture_name = "textures/ui/select.png";
+GLuint select_texture_id = -1;
+
+static const std::string arm_texture_name = "textures/player/arm.png";
+GLuint arm_texture_id = -1;
+
 //Light and Shadow
 vec3 sunlightPos = vec3(0.0f, 0.0f, 0.0f);
 GLuint depthMap;
@@ -76,6 +87,11 @@ static const std::string hand_fs("hand_fs.glsl");
 GLuint hand_shader_program = -1;
 GLuint hand_vao = -1;
 
+static const std::string ui_vs("ui_vs.glsl");
+static const std::string ui_fs("ui_fs.glsl");
+GLuint ui_shader_program = -1;
+GLuint ui_vao = -1;
+
 //Shadow files and IDs
 static const std::string shadow_vs("shadow_vs.glsl");
 static const std::string shadow_fs("shadow_fs.glsl");
@@ -86,7 +102,7 @@ float camangle = 0.0f;
 glm::vec3 campos(3.0f, 3.0f, 3.0f);
 float aspect = 1.0f;
 
-float win_w = 640.0f, win_h = 640.0f;
+float win_w = 1280.0f, win_h = 720.0f;
 float mouseX = win_w / 2, mouseY = win_h / 2;
 float verAxis = 0.0f, horAxis = 0.0f;
 Player player(glm::vec3(0.0f, 15.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f));
@@ -120,6 +136,43 @@ void draw_gui()
 	ImGui::End();
 
 	ImGui::Render();
+}
+
+void draw_ui() {
+
+	glUseProgram(ui_shader_program);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, ui_texture_id);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, select_texture_id);
+
+	glm::mat4 T = glm::translate(glm::vec3(0.2f * win_h / win_w * cubeType, 0.0f, 0.0f));
+	glm::mat4 S = glm::scale(glm::vec3(win_h / win_w, 1.0f, 1.0f));
+	int S_loc = glGetUniformLocation(ui_shader_program, "S");
+	if (S_loc != -1) {
+		glUniformMatrix4fv(S_loc, 1, false, glm::value_ptr(S));
+	}
+	int T_loc = glGetUniformLocation(ui_shader_program, "T");
+	if (T_loc != -1) {
+		glUniformMatrix4fv(T_loc, 1, false, glm::value_ptr(T));
+	}
+
+	int ui_tex_loc = glGetUniformLocation(ui_shader_program, "ui_tex");
+	if (ui_tex_loc != -1) {
+		glUniform1i(ui_tex_loc, 0);
+	}
+	int select_tex_loc = glGetUniformLocation(ui_shader_program, "select_tex");
+	if (select_tex_loc != -1) {
+		glUniform1i(select_tex_loc, 1);
+	}
+
+	glBindVertexArray(ui_vao);
+
+	glEnable(GL_ALPHA_TEST); // 启用Alpha测试 
+	glAlphaFunc(GL_GREATER, 0.1);// 设置Alpha测试条件为大于0.0则通过即完全透明
+	draw_ui(ui_vao);
+
+	glDisable(GL_ALPHA_TEST);
 }
 
 void draw_skybox(const glm::mat4& P, const glm::mat4& V)
@@ -248,15 +301,25 @@ void draw_skybox(const glm::mat4& P, const glm::mat4& V)
 }
 
 void draw_hands(const glm::mat4& P, const glm::mat4& V) {
-	glm::mat4 S = glm::scale(glm::vec3(0.1f, 0.1f, 0.8f));
-	glm::mat4 R = glm::rotate(player.yaw, yAxis)* glm::rotate(player.pitch, xAxis);
-	glm::mat4 T = glm::translate(player.position);
-	glm::mat4 M = T * R * glm::translate(glm::vec3(0.15f, -0.15f, 0.0f)) * S;
+	
+	player.hand.Update(player.position, player.pitch, player.yaw);
+	glUseProgram(cube_shader_program);
+	int arm_PVM_loc = glGetUniformLocation(cube_shader_program, "armPVM");
+	if (arm_PVM_loc != -1) {
+		glUniformMatrix4fv(arm_PVM_loc, 1, false, glm::value_ptr(P*V*player.hand.M));
+	}
 
-	glUseProgram(hand_shader_program);
-	int PVM_loc = glGetUniformLocation(hand_shader_program, "PVM");
-	if (PVM_loc != -1) {
-		glUniformMatrix4fv(PVM_loc, 1, false, glm::value_ptr(P*V*M));
+	int arm_M_loc = glGetUniformLocation(cube_shader_program, "armM");
+	if (arm_M_loc != -1) {
+		glUniformMatrix4fv(arm_M_loc, 1, false, glm::value_ptr(player.hand.M));
+	}
+
+	glActiveTexture(GL_TEXTURE9);
+	glBindTexture(GL_TEXTURE_2D, arm_texture_id);
+	int arm_tex_loc = glGetUniformLocation(cube_shader_program, "arm_tex");
+	if (arm_tex_loc != -1)
+	{
+		glUniform1i(arm_tex_loc, 9);
 	}
 	glBindVertexArray(hand_vao);
 	draw_hand(hand_vao);
@@ -370,6 +433,15 @@ void draw_cubes(const glm::mat4& P, const glm::mat4& V)
 		glUniform1i(depthMap_loc, 7);
 	}
 
+	glActiveTexture(GL_TEXTURE8);
+	glBindTexture(GL_TEXTURE_2D, brick_texture_id);
+
+	int brickMap_loc = glGetUniformLocation(cube_shader_program, "brick_tex");
+	if (brickMap_loc != -1)
+	{
+		glUniform1i(brickMap_loc, 8);
+	}
+
 	glDepthMask(GL_FALSE);
 	glBindVertexArray(plane_vao);
 	draw_plane(plane_vao);
@@ -377,6 +449,8 @@ void draw_cubes(const glm::mat4& P, const glm::mat4& V)
 
 	glBindVertexArray(cube_vao);
 	draw_cubes(cube_vao);
+
+	draw_hands(P, V);
 
 	glEnable(GL_CULL_FACE);
 	glBindVertexArray(trans_cube_vao);
@@ -440,12 +514,15 @@ void display()
 	glm::mat4 V = glm::lookAt(player.position, player.Target(), glm::vec3(0.0f, 1.0f, 0.0f));
 	glm::mat4 P = glm::perspective(80.0f, aspect, 0.1f, 100.0f); //not affine
 
+	setWaterFlowPos(V * glm::vec4(0.0f, 0.0f, 5.0f, 1.0f));
+	setBirdPos(V * glm::vec4(5.0f, 0.0f, 0.0f, 1.0f));
+
 	draw_skybox(P, V);
 	drawShadowMap();
 	draw_cubes(P, V);
-	draw_hands(P, V);
 
-	draw_gui();
+	draw_ui();
+	//draw_gui();
 	glutSwapBuffers();
 }
 
@@ -459,7 +536,7 @@ void idle()
 	float t = (time_sec - int(time_sec / int(cycleTime)) * cycleTime) / cycleTime;
 	float angle = t * 3.1415926f;
 	sunlightPos = vec3(cos(angle), sin(angle), 0.5f) * 15.0f;
-
+	
 	glUseProgram(cube_shader_program);
 	int time_loc = glGetUniformLocation(cube_shader_program, "time_sec");
 	if (time_loc != -1)
@@ -547,6 +624,7 @@ void initOpenGl()
 	plane_shader_program = InitShader(plane_vs.c_str(), plane_fs.c_str());
 	shadow_shader_program = InitShader(shadow_vs.c_str(), shadow_fs.c_str());
 	hand_shader_program = InitShader(hand_vs.c_str(), hand_fs.c_str());
+	ui_shader_program = InitShader(ui_vs.c_str(), ui_fs.c_str());
 
 	init_map();
 	init_shadow_map();
@@ -556,6 +634,7 @@ void initOpenGl()
 	trans_cube_vao = create_trans_cube_vao();
 	plane_vao = create_plane_vao();
 	hand_vao = create_hand_vao();
+	ui_vao = create_ui_vao();
 
 	ImGui_ImplGlut_Init(); // initialize the imgui system
 
@@ -568,10 +647,16 @@ void initOpenGl()
 	tree_leaves_texture_id = LoadTexture(tree_leaves_texture_name);
 
 	water_still_texture_id = LoadTexture(water_still_texture_name);
-	
+	brick_texture_id = LoadTexture(brick_texture_name);
+	ui_texture_id = LoadTexture(ui_texture_name);
+	select_texture_id = LoadTexture(select_texture_name);
+	arm_texture_id = LoadTexture(arm_texture_name);
+
 	SetCursorPos(mouseX, mouseY);
 
 	playBGM();
+	playWaterFlow();
+	playBird();
 
 	//glutFullScreen();
 }
@@ -646,9 +731,11 @@ void mouse(int button, int state, int x, int y) {
 		switch (button)
 		{
 		case GLUT_LEFT_BUTTON:
+			player.hand.anim_trigger = true;
 			DeleteCube(player.GetTargetCube(0));
 			break;
 		case GLUT_RIGHT_BUTTON:
+			player.hand.anim_trigger = true;
 			AddCube(player.GetTargetCube(1), cubeType);
 			break;
 		default:
